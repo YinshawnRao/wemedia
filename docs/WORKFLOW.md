@@ -73,6 +73,17 @@ The brief should lock:
 - voiceover plan
 - music or sound design notes
 
+If the user asks for 配音、旁白、解说、口播、读稿 or 有声音, the voiceover plan defaults to the project-approved Kokoro profile:
+
+```text
+config/tts/default-voiceover.json
+scripts/tts/render-default-voiceover.sh
+scripts/tts/voiceover-video.sh
+voice: zm_yunxi
+```
+
+This is a black-box default for the user. Do not ask whether to use a male/female voice, do not offer old Kokoro voices, and do not use the removed ONNX runtime unless the user explicitly asks to change the default voice.
+
 ## 5. HyperFrames Build
 
 Create one HyperFrames project per finished video under `hyperframes/projects/<video-slug>/`.

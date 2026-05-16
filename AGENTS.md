@@ -17,7 +17,7 @@
 - 默认协作模式是“个人本地测试 / 实验预览”，不是商业发布包、不是正式素材库入库。
 - 用户没有明确说“正式入库”“正式发布”“生成可商用交付包”时，一律使用 `WEMEDIA_OUTPUT_MODE=test` 的思路。
 - 默认所有下载、切片、渲染、接触表、试剪视频都写入 `sandbox/`；不得把测试产物写进 `downloads/`、`clips/`、`audio/`、`subtitles/`、`assets/exports/` 等正式目录。
-- 音乐盘点类 demo 默认不做付费 TTS、不配生硬旁白，优先保留素材原声；除非用户明确要求配音或字幕转写。
+- 音乐盘点类 demo 默认优先保留素材原声；只要用户明确要求配音、旁白、解说或口播，自动使用当前项目默认配音声线，不再询问 TTS 方案或声音选择。
 - 默认交付的是本地 demo：`sandbox/exports/<experiment-id>/<slug>-preview.mp4` 和 `<slug>-contact-sheet.jpg`。
 - 所有未明确授权的音乐/视频素材仍标记 `rights_review`；这表示“本地测试仍需留痕”，不是“阻止制作”。不能声称可商用。
 
@@ -33,6 +33,19 @@
 8. 进入 HyperFrames 前，先写剪辑简报到 `data/briefs/`，再创建或更新 `hyperframes/projects/<video-slug>/`。
 9. 制作 HyperFrames 时必须读取 `DESIGN.md`，按其中的色彩、字体、动效气质执行。
 10. 交付前至少做一次结构检查、视觉检查和导出检查；如果没法运行检查，要明确说明原因。
+
+## 默认本地配音标准
+
+- 当前唯一默认配音标准是 `tts-local-benchmark` 中用户认可的 Kokoro 声线：`zm_yunxi`。
+- 配置文件：`config/tts/default-voiceover.json`。
+- 生成入口：`scripts/tts/render-default-voiceover.sh`。
+- 混音入口：`scripts/tts/add-voiceover.sh`。
+- 一步式视频配音入口：`scripts/tts/voiceover-video.sh`。
+- 触发规则：用户说“配音”“旁白”“解说”“口播”“读稿”“有声音”“voiceover”“narration”，或要求“做一个有配音的视频”时，默认自动使用 `zm_yunxi` 生成旁白并接入视频流程。
+- 输出位置：默认写入 `sandbox/voiceover/<experiment-id>/` 或当前任务的 sandbox 目录，不写入正式 `audio/`，除非用户明确要求正式入库。
+- 不再使用已废弃的旧 Kokoro ONNX runtime、`.venv-kokoro-runtime`、`models/kokoro/`、`am_michael`、`zf_xiaobei` 或旧 voice-map 文件。
+- 如果视频原本有素材原声且用户要求配音，默认降低素材原声音量并让旁白保持清晰；音乐盘点是否保留完整副歌优先级高于旁白密度。
+- 未来如需换声音，必须由用户明确提出“更换默认配音声线”后再重新调整；在此之前，所有配音需求都使用 `zm_yunxi`。
 
 ## 音乐盘点视频硬规则
 

@@ -1,0 +1,22 @@
+{
+  "profile_id": "default_kokoro_yunxi",
+  "engine": "kokoro",
+  "voice": "zm_yunxi",
+  "lang_code": "z",
+  "speed": 1.0,
+  "sample_rate": 24000,
+  "runtime_python": "tts-local-benchmark/vendor/kokoro-test/venv/bin/python",
+  "standard_sample": "tts-local-benchmark/outputs/kokoro/kokoro_zm_yunxi_long_text.wav",
+  "output_root": "sandbox/voiceover",
+  "auto_trigger_words": [
+    "配音",
+    "旁白",
+    "解说",
+    "口播",
+    "读稿",
+    "有声音",
+    "voiceover",
+    "narration"
+  ],
+  "notes": "Current project-wide default voice selected by user from tts-local-benchmark Kokoro outputs. Use this black-box voice for every narration/voiceover request unless the user explicitly asks to change the default."
+}

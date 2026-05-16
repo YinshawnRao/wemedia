@@ -218,15 +218,15 @@ Evidence: `amei-top5-vocal-difficulty-preview.mp4` 使用 `三天三夜`、`掉�
 
 Action: 后续做强声型女歌手时，TOP 文案优先拆“体力线”和“声压维持”，再补参考峰值。
 
-## 2026-05-15: Chinese Roundup Narration Voice Preference
+## 2026-05-15: Deprecated Old Kokoro Narration Preference
 
 Experiment: `experiment-012`
 
-Learning: 用户确认 `am_michael` + `cmn` 这版 Kokoro 男声更适合作为“从夯到拉”等盘点视频的默认旁白，听感更接近沉稳播音主持。
+Learning: 旧的 `am_michael` / `zf_xiaobei` Kokoro ONNX 方案已废弃，不再作为项目默认配音标准。
 
-Evidence: 在“川菜从夯到拉”样片中，用户试听女声 `zf_xiaobei`、`zf_xiaoxiao` 后，选择男声 `am_michael` 并反馈“这个好，后面就用这个吧”。
+Evidence: 用户在 2026-05-16 明确确认 `tts-local-benchmark` 里的 Kokoro `zm_yunxi` 才是想要的配音标准，并要求删除旧方案避免误导。
 
-Action: 后续中文盘点/吐槽类视频默认使用 Kokoro `am_michael`、`lang=cmn`、`speed≈1.08`；如需更标准原生普通话男声，再单独评估新的本地 TTS 模型。
+Action: 不再使用 `.venv-kokoro-runtime`、`models/kokoro/`、`scripts/tts/kokoro-speak.sh` 或旧 voice-map；默认改用 `config/tts/default-voiceover.json` 和 `scripts/tts/render-default-voiceover.sh`。
 
 ## 2026-05-13: 1080p Format Cap Works For Fast Preview Downloads
 
@@ -248,15 +248,25 @@ Evidence: 用户直接指出“普通朋友没有很难吧？”，随后 `exper
 
 Action: 后续组合盘点先为每位歌手写一句“难在哪里”，再选歌；如果选曲只是有名但不够难，应主动替换。
 
-## 2026-05-15: Kokoro Local TTS Needs Python 3.12 And Model Files
+## 2026-05-15: Deprecated Old Kokoro Runtime
 
 Experiment: `experiment-012`
 
-Learning: `kokoro-tts` can run locally without API keys, but the package alone is not enough. The system `/usr/bin/python3` was too old for current `onnxruntime`; using the bundled Python 3.12 venv worked. Kokoro also requires `kokoro-v1.0.onnx` and `voices-v1.0.bin` model files.
+Learning: 旧 `kokoro-tts` ONNX runtime 方案会和当前默认配音声线冲突，后续不再保留。
 
-Evidence: `.venv-kokoro-runtime` installed `kokoro-tts 2.3.1`; `scripts/tts/kokoro-speak.sh` generated `sandbox/exports/experiment-012/kokoro-smoke.wav` and `kokoro-narration.wav`. Full narration duration was `37.994667s`.
+Evidence: 旧方案依赖 `.venv-kokoro-runtime`、`models/kokoro/kokoro-v1.0.onnx`、`models/kokoro/voices-v1.0.bin` 和 `scripts/tts/kokoro-speak.sh`；这些已被删除。
 
-Action: For no-key voiceover tests, use `scripts/tts/kokoro-speak.sh ... --lang cmn --voice zf_xiaobei --speed 1.1-1.25`. Keep the venv and model files local/ignored.
+Action: 后续本地无 KEY 配音统一使用 benchmark 验证过的 pip Kokoro + `misaki[zh]` 环境，默认 voice 为 `zm_yunxi`。
+
+## 2026-05-16: Sun Nan Difficulty Copy Should Emphasize Pressure And Thickness
+
+Experiment: `experiment-033`
+
+Learning: 孙楠这类男声高压难度盘点不适合只写“飙高音”。更贴切的角度是亮硬高音、持续声压、厚度、穿透力、真假声转换和后段续航。
+
+Evidence: `sun-nan-top5-vocal-difficulty-preview.mp4` 使用《不见不散》《风往北吹》《你快回来》《燃烧》《拯救》五段素材，文案分别强调高位咬字、厚度上推、呼喊穿透、瞬间飙升和声压硬顶。
+
+Action: 后续男声难度盘点先判断“高压厚声型、控制型、R&B律动型、咬字型”等难法，再写对应文案，避免套用单一最高音模板。
 
 ## 2026-05-13: TOP Ranking Videos Should Count Down To Top 1
 
@@ -567,3 +577,13 @@ Learning: 只靠长对话上下文会让新会话存在漂移风险，尤其是�
 Evidence: 用户明确担心新开对话后会丢失“不要写到非 sandbox 目录”“这是个人测试用途不是商业行为”等细节。本轮已把这些规则写入 `AGENTS.md` 和 `memory/video-production-contract.md`，并同步到 README、docs 和 decisions。
 
 Action: 后续新对话开始制作视频前，先读 `AGENTS.md`、`memory/video-production-contract.md`、`memory/project-state.md`、`memory/learnings.md` 和 `DESIGN.md`。如果继续某个实验，再读对应 run log、demo output、source candidates 和 brief。
+
+## 2026-05-16: Kokoro Is The Current Local Chinese TTS Baseline
+
+Experiment: `tts-local-benchmark`
+
+Learning: 在本机 macOS / Apple Silicon 环境里，Kokoro pip + `misaki[zh]` 是当前最容易跑通的免费本地中文 TTS；其中用户认可的唯一默认配音声线是 `zm_yunxi`，只要需要配音就使用它，不要求用户强调“男声”。MeloTTS、ChatTTS-ui、CosyVoice、GPT-SoVITS、IndexTTS2 更依赖 Python 3.10+、conda、uv、git-lfs 或完整模型下载。
+
+Evidence: Kokoro 生成 13 条中文 wav 和对应 demo mp4；用户试听后确认 videos 目录里的 `zm_yunxi` 符合想要的配音标准，并补充“即使不强调男也应该用这个声音”。MeloTTS/ChatTTS-ui 安装后推理或服务卡住，CosyVoice/GPT-SoVITS 被 conda/Python 版本阻断，IndexTTS2 被 git-lfs/uv 阻断。
+
+Action: 自动剪辑旁白默认使用 `config/tts/default-voiceover.json` 中的 `zm_yunxi`，通过 `scripts/tts/render-default-voiceover.sh` 生成；需要直接给视频加旁白时用 `scripts/tts/voiceover-video.sh`。要验证更高自然度或固定音色时，先补齐 conda、uv、git-lfs，并用 Python 3.10/3.11 建独立环境。

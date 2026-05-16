@@ -92,6 +92,11 @@ tts-local-benchmark/outputs/
 tts-local-benchmark/videos/
 tts-local-benchmark/logs/
 
+# Voiceover scratch outputs and machine-local overrides
+sandbox/voiceover/
+config/tts/*.local.json
+config/tts/local-*.json
+
 # Local secrets
 .env
 .env.*

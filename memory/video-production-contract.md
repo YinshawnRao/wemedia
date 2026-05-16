@@ -80,11 +80,23 @@ Default format:
 - vertical short video
 - 1080x1920
 - source audio only
-- no narration
+- no narration unless the user explicitly asks for 配音 / 旁白 / 解说 / 口播
 - no paid TTS
 - concise lower-third text
 - contact sheet for visual QA
 - preview video in `sandbox/exports/<experiment-id>/`
+
+When narration is requested, use the project default voice. This applies even when the user does not say “male voice”; any 配音 / 旁白 / 解说 / 口播 request maps to this voice:
+
+```text
+config/tts/default-voiceover.json
+scripts/tts/render-default-voiceover.sh
+scripts/tts/voiceover-video.sh
+voice: zm_yunxi
+source standard: tts-local-benchmark Kokoro male output approved by user
+```
+
+Do not ask for a voice choice during normal video goals. Do not use the deprecated ONNX Kokoro runtime, `.venv-kokoro-runtime`, `models/kokoro/`, `am_michael`, `zf_xiaobei`, or old voice-map files.
 
 For `TOP5` difficulty/甜歌/翻唱/作品盘点 videos:
 

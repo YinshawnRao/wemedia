@@ -14,18 +14,18 @@ Last updated: 2026-05-16
 
 ## Active Experiment
 
-- Experiment: `experiment-032`
-- Direction: 梁静茹最难的5首歌
-- Candidate topic: 用户提供梁静茹 5 首高难度歌曲排名，按 Top5 -> Top1 揭晓；每段取最能体现演唱难点的片段，保留素材原声，叠加排名、歌名、歌手和演唱难点说明。
+- Experiment: `experiment-033`
+- Direction: 孙楠最难的5首歌
+- Candidate topic: 用户提供孙楠 5 首高难度歌曲排名，按 Top5 -> Top1 揭晓；每段取最能体现演唱难点的片段，保留素材原声，叠加排名、歌名、歌手和演唱难点说明。
 - Status: 已完成 1 条本地预览 demo；5 个片段各约 34 秒，整体约 3 分钟。
 
 ## Next Step
 
-查看梁静茹最难的歌 TOP5 demo，判断每首歌切点是否真正命中“最难段落”，尤其 Top1《燕尾蝶》的连续高位段、Top2《丝路》的副歌打开段，以及《情歌》《崇拜》使用官方音频源但画面偏静态是否可接受：
+查看孙楠最难的歌 TOP5 demo，判断每首歌切点是否真正命中“最难段落”，尤其 Top1《拯救》的后段持续声压、Top2《燃烧》的真假声与高点段，以及《风往北吹》使用歌词视频源、《燃烧》《拯救》使用 Topic 音频源的画面静态程度是否可接受：
 
 ```text
-sandbox/exports/experiment-032/fish-leong-top5-vocal-difficulty-preview.mp4
-sandbox/exports/experiment-032/fish-leong-top5-vocal-difficulty-contact-sheet.jpg
+sandbox/exports/experiment-033/sun-nan-top5-vocal-difficulty-preview.mp4
+sandbox/exports/experiment-033/sun-nan-top5-vocal-difficulty-contact-sheet.jpg
 ```
 
 ## Important Runtime Notes
@@ -38,8 +38,9 @@ sandbox/exports/experiment-032/fish-leong-top5-vocal-difficulty-contact-sheet.jp
 - 曾因误拒 Chrome 权限导致 `--cookies-from-browser chrome` 无法解密 cookies；重新允许权限后已成功读取 1728 cookies。
 - 手动 cookies 文件不作为当前主流程。
 - 初期测试默认使用 `WEMEDIA_OUTPUT_MODE=test`
-- 音乐盘点类 demo 暂时跳过付费 TTS 和生硬旁白，优先验证素材原声、节奏包装和版权边界。
-- 本地无 KEY 配音可用 Kokoro：已安装在 `.venv-kokoro-runtime`，模型在 `models/kokoro/`，便捷脚本为 `scripts/tts/kokoro-speak.sh`。中文可用 `--lang cmn --voice zf_xiaobei` 等。
+- 音乐盘点类 demo 默认优先验证素材原声、节奏包装和版权边界；如果用户明确要求配音/旁白/解说/口播/读稿/有声音，自动启用当前项目默认配音声线，不再询问声音选择。
+- 当前本地无 KEY 配音标准：`tts-local-benchmark` 里用户认可的 Kokoro `zm_yunxi`。配置为 `config/tts/default-voiceover.json`，生成入口为 `scripts/tts/render-default-voiceover.sh`，混音入口为 `scripts/tts/add-voiceover.sh`，一步式视频配音入口为 `scripts/tts/voiceover-video.sh`。
+- 旧 Kokoro ONNX runtime 已废弃并清理；不要再使用 `.venv-kokoro-runtime`、`models/kokoro/`、`scripts/tts/kokoro-speak.sh`、`am_michael`、`zf_xiaobei` 或旧 voice-map。
 - 音乐盘点如果要听副歌/Hook，每段 6 秒太短；当前经验是每段至少 25-30 秒。
 - HyperFrames 适合短视频精修；4 分钟以上长音乐盘点可先用 ffmpeg 快速预览，再决定是否回 HyperFrames 做精修。
 - 单歌手专题比“多人名单式盘点”更适合做人物弧线；当前实验用五首歌覆盖早期辨识度、高音、情歌、遗憾感和后期能量。
@@ -82,3 +83,5 @@ sandbox/exports/experiment-032/fish-leong-top5-vocal-difficulty-contact-sheet.jp
 - YouTube 字幕下载可能单独触发 HTTP 429；如果视频切片本身可下载，可保留同一 URL 和切点，关闭字幕下载后先完成本地预览，再把异常写入 run log。
 - `experiment-032` 梁静茹难度盘点适合强调“温柔控制型”：清透高位、真假声边缘、气息线条、音准细节和情绪层次；不要把文案写成大嗓高音竞赛。
 - 当官方 MV 不好找时，官方 artist/Topic 音频源适合作为声音优先的本地预览方案；如果用户看重画面运动，二版再替换 MV 或现场备选。
+- `experiment-033` 孙楠难度盘点适合强调“高压厚声型”：高位亮硬、持续声压、呼喊穿透、真假声转换、厚度和后段续航；不要只写最高音。
+- 对男声高压难度盘点，Topic audio 适合先验证声音和切点，但如果用户重视画面运动，二版优先替换为官方 MV 或官方节目 live。

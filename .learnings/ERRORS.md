@@ -30,6 +30,35 @@ Use fast ffmpeg previews for long-form pacing checks, or reduce duration/fps bef
 
 ---
 
+## [ERR-20260516-009] rg_backtick_pattern_shell_expansion
+
+**Logged**: 2026-05-16T16:35:13+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: docs
+
+### Summary
+An `rg` verification command used backticks inside a double-quoted pattern, causing zsh command substitution.
+
+### Error
+```text
+zsh:1: command not found: zm_yunxi
+```
+
+### Context
+- Command attempted to search for stale docs containing a literal `` `zm_yunxi` `` pattern.
+- The shell interpreted the backticked text before `rg` ran.
+- Resolution: avoid backticks in double-quoted shell patterns, or quote the pattern safely.
+
+### Suggested Fix
+Use single-quoted patterns or remove Markdown backticks when searching for literal inline-code text.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `AGENTS.md`, `memory/video-production-contract.md`
+
+---
+
 ## [ERR-20260510-003] node_template_literal_escape
 
 **Logged**: 2026-05-10T22:20:00+08:00
@@ -435,6 +464,95 @@ Retry in a clean Python 3.10/3.11 environment, preferably without WebUI/Gradio d
 
 ---
 
+## [ERR-20260516-005] chattts_ui_torch_version_deadlock
+
+**Logged**: 2026-05-16T00:00:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: tts
+
+### Summary
+ChatTTS-ui installed and downloaded most model assets, but local API startup did not complete on macOS arm64.
+
+### Error
+```text
+AttributeError: module 'torch.serialization' has no attribute 'FILE_LIKE'
+```
+
+### Context
+- README-recommended `torch==2.2.0` conflicted with current `vector-quantize-pytorch>=1.29.0` and hung before port 9966 opened.
+- `torch==2.8.0` failed immediately because ChatTTS code references removed `torch.serialization.FILE_LIKE`.
+- `torch==2.4.1` avoided the immediate error but still hung during model loading.
+
+### Suggested Fix
+Try a known-good commit/release of ChatTTS-ui with pinned dependencies, or use the project’s Docker CPU image instead of source install on macOS.
+
+### Metadata
+- Reproducible: unknown
+- Related Files: `tts-local-benchmark/outputs/chattts-ui/status.json`
+
+---
+
+## [ERR-20260516-006] cosyvoice_python_version_requirements
+
+**Logged**: 2026-05-16T00:00:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: tts
+
+### Summary
+CosyVoice official dependencies could not be installed without a Python 3.10 conda environment.
+
+### Error
+```text
+ERROR: No matching distribution found for gradio==5.4.0
+ModuleNotFoundError: No module named 'pkg_resources'
+```
+
+### Context
+- System Python 3.9 cannot install `gradio==5.4.0`.
+- Bundled Python 3.12 fails building `grpcio==1.57.0`.
+- Official docs recommend conda with Python 3.10.
+
+### Suggested Fix
+Install Miniconda or use a Python 3.10 manager, then retry official `pip install -r requirements.txt` and `FunAudioLLM/Fun-CosyVoice3-0.5B-2512` or `CosyVoice2-0.5B`.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `tts-local-benchmark/outputs/cosyvoice/status.json`
+
+---
+
+## [ERR-20260516-007] gpt_sovits_no_conda_no_models
+
+**Logged**: 2026-05-16T00:00:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: tts
+
+### Summary
+GPT-SoVITS dependencies installed manually, but the official installer and WebUI flow did not complete.
+
+### Error
+```text
+[ERROR]: Conda Not Found
+```
+
+### Context
+- `install.sh --device CPU --source HF` exits immediately without conda.
+- Manual venv installation of `extra-req.txt` and `requirements.txt` succeeded.
+- Pretrained models and G2PW assets were not downloaded because the official installer did not run.
+- WebUI startup hung without reaching a usable service.
+
+### Suggested Fix
+Use a conda Python 3.10 environment and rerun `bash install.sh --device CPU --source HF`, then test only with user-owned or included sample reference audio.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `tts-local-benchmark/outputs/gpt-sovits/status.json`
+
+---
+
 ## [ERR-20260516-005] git_init_sandbox_permission
 
 **Logged**: 2026-05-16T15:45:00+08:00
@@ -461,5 +579,36 @@ If initializing a repository in this workspace fails with `Operation not permitt
 ### Metadata
 - Reproducible: unknown
 - Related Files: `.gitignore`, `README.md`
+
+---
+
+## [ERR-20260516-008] ytdlp_sandbox_semaphore_repro
+
+**Logged**: 2026-05-16T16:25:19+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: video
+
+### Summary
+`yt-dlp` again failed inside the restricted sandbox because its PyInstaller binary could not initialize a sync semaphore.
+
+### Error
+```text
+[PYI-3201:ERROR] Failed to initialize sync semaphore!
+semctl: Operation not permitted
+```
+
+### Context
+- Task: smoke-check `yt-dlp --version` before Experiment 033 source search and downloads.
+- Working directory: `/Users/yinshawnrao/explorer/wemedia`.
+- Resolution: reran yt-dlp searches and downloads sequentially with approved local permissions.
+
+### Suggested Fix
+When this semaphore error appears, use approved local permissions for yt-dlp and keep searches/downloads sequential.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `experiments/experiment-033/run_log.md`
+- See Also: `ERR-20260515-001`
 
 ---

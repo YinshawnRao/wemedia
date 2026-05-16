@@ -27,3 +27,14 @@
 ## 注意
 
 重型方案可能需要较大的模型下载、较长安装时间或指定硬件。每个方案最多尝试两轮：官方推荐方式和一个可行替代方式；仍失败则记录原因并继续下一个方案。
+
+## 本轮结果
+
+- Kokoro 中文：已跑通，生成 13 条 wav，并用 ffmpeg 生成对应 demo mp4。
+- MeloTTS：安装成功，但 CLI/API 推理在首条中文样本卡住。
+- ChatTTS-ui：安装成功，但本机源码服务未能稳定启动到 API 可访问状态。
+- CosyVoice / CosyVoice3：缺 conda + Python 3.10 环境，依赖安装失败。
+- GPT-SoVITS：官方安装缺 conda，手动依赖部分成功，但 WebUI/模型/参考音频链路未跑通。
+- IndexTTS2：缺 git-lfs 和 uv，官方流程无法完整检出与同步。
+
+详细结论见 `report.md`。优先试听 `outputs/kokoro/` 下的 wav 文件。
