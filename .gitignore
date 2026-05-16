@@ -1,0 +1,100 @@
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+
+# Dependencies and build outputs
+node_modules/
+dist/
+build/
+.cache/
+.turbo/
+.parcel-cache/
+.next/
+coverage/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.venv-kokoro/
+.venv-kokoro-runtime/
+
+# Local models and checkpoints
+models/**/*
+!models/**/
+!models/**/.gitkeep
+!models/**/README.md
+kokoro-v1.0.onnx
+voices-v1.0.bin
+*.onnx
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.gguf
+
+# Video/audio files are usually source material or generated output.
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.avi
+*.m4v
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.flac
+*.aiff
+*.aif
+
+# Raw/processed media can become very large.
+# Keep examples, manifests, and small hand-authored assets in git.
+assets/raw/**/*
+assets/processed/**/*
+assets/exports/**/*
+!assets/**/.gitkeep
+!assets/**/README.md
+
+# yt-dlp intake outputs and local logs
+downloads/**/*
+clips/**/*
+audio/**/*
+subtitles/**/*
+logs/*
+!downloads/.gitkeep
+!clips/.gitkeep
+!audio/.gitkeep
+!subtitles/.gitkeep
+!logs/.gitkeep
+
+# Disposable workflow tests
+sandbox/**/*
+!sandbox/.gitkeep
+!sandbox/README.md
+!sandbox/**/.gitkeep
+!sandbox/**/README.md
+
+# HyperFrames local media and render outputs
+hyperframes/projects/**/assets/**/*
+!hyperframes/projects/**/assets/
+!hyperframes/projects/**/assets/.gitkeep
+!hyperframes/projects/**/assets/README.md
+hyperframes/projects/**/renders/
+hyperframes/projects/**/.hyperframes/
+
+# Local TTS benchmark dependencies and generated samples
+tts-local-benchmark/vendor/
+tts-local-benchmark/outputs/
+tts-local-benchmark/videos/
+tts-local-benchmark/logs/
+
+# Local secrets
+.env
+.env.*
+secrets/cookies/*
+!secrets/cookies/.gitkeep
+!secrets/cookies/README.md

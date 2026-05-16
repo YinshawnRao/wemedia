@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        margin: 0;
+        overflow: hidden;
+        background: #0e1116;
+        font-family: Inter, "IBM Plex Sans Condensed", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+      }
+
+      #noodles-hang-to-la {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        color: #f8fafc;
+        background:
+          repeating-linear-gradient(90deg, rgba(247, 242, 232, 0.045) 0 1px, transparent 1px 86px),
+          linear-gradient(180deg, #0e1116 0%, #151719 48%, #0e1116 100%);
+      }
+
+      .stage-line {
+        position: absolute;
+        left: 64px;
+        right: 64px;
+        height: 2px;
+        background: rgba(247, 242, 232, 0.12);
+      }
+
+      .stage-line.top {
+        top: 142px;
+      }
+
+      .stage-line.bottom {
+        bottom: 224px;
+      }
+
+      .tag {
+        position: absolute;
+        top: 68px;
+        left: 64px;
+        color: #2bb3a3;
+        font-size: 24px;
+        font-weight: 900;
+      }
+
+      .small-note {
+        position: absolute;
+        top: 66px;
+        right: 64px;
+        color: rgba(248, 250, 252, 0.72);
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .intro {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 84px 220px;
+      }
+
+      .intro h1 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 122px;
+        line-height: 0.98;
+        letter-spacing: 0;
+        font-weight: 950;
+      }
+
+      .intro h1 span {
+        color: #e94b35;
+      }
+
+      .intro p {
+        width: 800px;
+        margin: 28px 0 0;
+        color: #f7f2e8;
+        font-size: 38px;
+        line-height: 1.34;
+        font-weight: 800;
+      }
+
+      .board-wrap {
+        position: absolute;
+        left: 62px;
+        top: 284px;
+        width: 956px;
+        height: 1066px;
+        border: 3px solid rgba(0, 0, 0, 0.94);
+        background: #d7d6d0;
+        overflow: hidden;
+      }
+
+      .row {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 213px;
+        border-bottom: 3px solid rgba(0, 0, 0, 0.92);
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+      }
+
+      .tier {
+        width: 146px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 3px solid rgba(0, 0, 0, 0.92);
+        color: #111111;
+        font-size: 42px;
+        line-height: 1.05;
+        font-weight: 950;
+        text-align: center;
+      }
+
+      .tier.hot {
+        background: #e94b35;
+      }
+
+      .tier.top {
+        background: #f2c14e;
+      }
+
+      .tier.human {
+        background: #fff25a;
+      }
+
+      .tier.npc {
+        background: #f7f2e8;
+      }
+
+      .tier.low {
+        background: #f8fafc;
+        font-size: 33px;
+      }
+
+      .cell {
+        position: relative;
+        flex: 1;
+        background: #d7d6d0;
+      }
+
+      .chip {
+        position: absolute;
+        min-width: 164px;
+        height: 74px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 22px;
+        border: 3px solid #0e1116;
+        background: #f7f2e8;
+        color: #0e1116;
+        font-size: 30px;
+        font-weight: 950;
+        box-shadow: 8px 8px 0 rgba(14, 17, 22, 0.28);
+        transform: translate3d(760px, 0, 0);
+        opacity: 0;
+      }
+
+      .chip::before {
+        content: "";
+        width: 14px;
+        height: 34px;
+        margin-right: 13px;
+        background: #e94b35;
+      }
+
+      .chip.teal::before {
+        background: #2bb3a3;
+      }
+
+      .chip.yellow::before {
+        background: #f2c14e;
+      }
+
+      .chip.wide {
+        min-width: 230px;
+      }
+
+      .score {
+        position: absolute;
+        right: 70px;
+        top: 1386px;
+        display: flex;
+        gap: 13px;
+      }
+
+      .score span {
+        width: 46px;
+        height: 10px;
+        background: rgba(247, 242, 232, 0.22);
+      }
+
+      .score span.on {
+        background: #2bb3a3;
+      }
+
+      .caption {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 86px;
+        color: #f2c14e;
+        font-size: 58px;
+        line-height: 1.2;
+        font-weight: 950;
+        text-align: center;
+        text-shadow: 0 5px 0 #000, 0 0 22px rgba(0, 0, 0, 0.88);
+      }
+
+      .closing {
+        position: absolute;
+        inset: 0;
+        z-index: 9;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0 80px 300px;
+        background: rgba(14, 17, 22, 0.78);
+        opacity: 0;
+      }
+
+      .closing h2 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 74px;
+        line-height: 1.08;
+        font-weight: 950;
+      }
+
+      .closing p {
+        margin: 26px 0 0;
+        color: #2bb3a3;
+        font-size: 42px;
+        font-weight: 950;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="noodles-hang-to-la"
+      data-composition-id="noodles-hang-to-la"
+      data-start="0"
+      data-duration="46"
+      data-width="1080"
+      data-height="1920"
+    >
+      <audio id="narration" data-start="0" data-duration="45.5" data-track-index="1" data-volume="1" src="assets/narration.wav"></audio>
+
+      <div id="tag" class="clip tag" data-start="0" data-duration="46" data-track-index="2">LOCAL TEST / HANG TO LA</div>
+      <div id="note" class="clip small-note" data-start="0" data-duration="46" data-track-index="3">主观娱乐榜</div>
+      <div class="stage-line top" data-layout-ignore></div>
+      <div class="stage-line bottom" data-layout-ignore></div>
+
+      <div id="board" class="clip board-wrap" data-start="3.5" data-duration="36" data-track-index="4">
+        <div class="row">
+          <div class="tier hot">夯</div>
+          <div class="cell">
+            <div id="chip-lanzhou" class="chip wide" style="left: 38px; top: 66px">兰州牛肉面</div>
+            <div id="chip-youpomian" class="chip teal" style="left: 326px; top: 66px">油泼面</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="tier top">顶级</div>
+          <div class="cell">
+            <div id="chip-xiaomian" class="chip" style="left: 28px; top: 66px">重庆小面</div>
+            <div id="chip-reganmian" class="chip teal wide" style="left: 255px; top: 66px">武汉热干面</div>
+            <div id="chip-zhajiang" class="chip yellow" style="left: 546px; top: 66px">炸酱面</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="tier human">人上人</div>
+          <div class="cell">
+            <div id="chip-ranmian" class="chip" style="left: 36px; top: 66px">宜宾燃面</div>
+            <div id="chip-congyou" class="chip teal" style="left: 306px; top: 66px">葱油拌面</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="tier npc">NPC</div>
+          <div class="cell">
+            <div id="chip-fanqie" class="chip yellow wide" style="left: 44px; top: 66px">番茄鸡蛋面</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="tier low">拉完了</div>
+          <div class="cell">
+            <div id="chip-waimai" class="chip wide" style="left: 42px; top: 66px">外卖坨坨面</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="score" class="clip score" data-start="4.5" data-duration="33" data-track-index="5">
+        <span id="tick-1"></span><span id="tick-2"></span><span id="tick-3"></span><span id="tick-4"></span><span id="tick-5"></span><span id="tick-6"></span><span id="tick-7"></span><span id="tick-8"></span><span id="tick-9"></span>
+      </div>
+
+      <div id="intro" class="clip intro" data-start="0" data-duration="5" data-track-index="8">
+        <h1>面条从<span>夯</span>到拉</h1>
+        <p>主观娱乐榜，只聊第一口冲击力。</p>
+      </div>
+
+      <div id="closing" class="clip closing" data-start="39" data-duration="7" data-track-index="9">
+        <h2>面条江湖没有标准答案。</h2>
+        <p>你心里的夯面是哪一碗？</p>
+      </div>
+
+      <div id="caption" class="clip caption" data-start="0" data-duration="46" data-track-index="10">面条从夯到拉，主观娱乐版。</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const DURATION = 46;
+      const captions = [
+        [0, 4.5, "面条从夯到拉，主观娱乐版。"],
+        [4.5, 8, "兰州牛肉面：汤清肉香辣子亮，一碗直接开局。"],
+        [8, 11.5, "油泼面：热油一响，碳水的灵魂就归位了。"],
+        [11.5, 15, "重庆小面：小碗能打，麻辣鲜香全在底料。"],
+        [15, 18.5, "武汉热干面：芝麻酱一拌，早过早的王炸。"],
+        [18.5, 22, "炸酱面：酱香稳准狠，黄瓜丝都像助攻。"],
+        [22, 25.5, "宜宾燃面：干香麻辣，越吃越想来口水。"],
+        [25.5, 29, "葱油拌面：简单到离谱，香到没朋友。"],
+        [29, 32.5, "番茄鸡蛋面：舒服，但太像家常默认档。"],
+        [32.5, 37.5, "外卖坨坨面：送到已经结块，拌不开也救不回。"],
+        [37.5, 46, "面条江湖，没有标准答案。你心里的夯面是哪一碗？"]
+      ];
+      const thresholds = [4.9, 8.1, 11.7, 15.2, 18.7, 22.2, 25.7, 29.2, 32.7];
+      const chipStarts = {
+        "chip-lanzhou": 4.9,
+        "chip-youpomian": 8.1,
+        "chip-xiaomian": 11.7,
+        "chip-reganmian": 15.2,
+        "chip-zhajiang": 18.7,
+        "chip-ranmian": 22.2,
+        "chip-congyou": 25.7,
+        "chip-fanqie": 29.2,
+        "chip-waimai": 32.7
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function easeOutCubic(value) {
+        const x = clamp(value, 0, 1);
+        return 1 - Math.pow(1 - x, 3);
+      }
+
+      function activeCaption(t) {
+        return captions.find((item) => t >= item[0] && t < item[1]) || captions[captions.length - 1];
+      }
+
+      function renderAt(t) {
+        const caption = document.getElementById("caption");
+        caption.textContent = activeCaption(t)[2];
+
+        const intro = document.getElementById("intro");
+        intro.style.opacity = String(clamp(1 - (t - 4.1) / 0.7, 0, 1));
+        intro.style.transform = `translateY(${Math.round(-22 * clamp((t - 4.1) / 0.7, 0, 1))}px)`;
+
+        const board = document.getElementById("board");
+        const boardIn = easeOutCubic((t - 3.4) / 0.7);
+        board.style.opacity = String(boardIn);
+        board.style.transform = `translateY(${Math.round((1 - boardIn) * 46)}px)`;
+
+        Object.entries(chipStarts).forEach(([id, start]) => {
+          const chip = document.getElementById(id);
+          const p = easeOutCubic((t - start) / 0.48);
+          chip.style.opacity = String(p);
+          chip.style.transform = `translate3d(${Math.round((1 - p) * 760)}px, 0, 0)`;
+        });
+
+        for (let i = 1; i <= 9; i += 1) {
+          const tick = document.getElementById(`tick-${i}`);
+          tick.className = t >= thresholds[i - 1] ? "on" : "";
+        }
+
+        const closing = document.getElementById("closing");
+        const closingIn = easeOutCubic((t - 37.4) / 0.8);
+        closing.style.opacity = String(closingIn);
+      }
+
+      renderAt(0);
+      let tl;
+      if (window.gsap) {
+        const state = { time: 0 };
+        tl = gsap.timeline({ paused: true });
+        tl.to(state, {
+          time: DURATION,
+          duration: DURATION,
+          ease: "none",
+          onUpdate: () => renderAt(state.time)
+        }, 0);
+      } else {
+        tl = {
+          seek(value) {
+            renderAt(value);
+            return this;
+          },
+          time(value) {
+            if (typeof value === "number") renderAt(value);
+            return this;
+          },
+          duration() {
+            return DURATION;
+          },
+          pause() {
+            return this;
+          }
+        };
+      }
+      window.renderAt = renderAt;
+      window.__timelines["noodles-hang-to-la"] = tl;
+    </script>
+  </body>
+</html>
