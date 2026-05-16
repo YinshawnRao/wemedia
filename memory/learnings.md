@@ -258,6 +258,46 @@ Evidence: 旧方案依赖 `.venv-kokoro-runtime`、`models/kokoro/kokoro-v1.0.on
 
 Action: 后续本地无 KEY 配音统一使用 benchmark 验证过的 pip Kokoro + `misaki[zh]` 环境，默认 voice 为 `zm_yunxi`。
 
+## 2026-05-16: Intro-Only Voiceover Should Not Duck The Whole Music Preview
+
+Experiment: `experiment-035`
+
+Learning: 音乐盘点只要求片头读主标题时，不适合直接用全片 voiceover 混音脚本；该脚本会把整条素材原声音量下压，影响后面 5 段歌曲体验。
+
+Evidence: 蔡依林 TOP5 demo 先渲染 source-audio base preview，再只把 2.875 秒 `zm_yunxi` 片头配音混到开头，最终歌曲段保留原素材声音。
+
+Action: 后续“片头几秒有配音、歌曲段保留原声”的任务，使用局部混音方式；只有全片旁白才用通用 ducking 脚本。
+
+## 2026-05-16: Timestamp-Based Contact Sheets Are Safer After Concat
+
+Experiment: `experiment-035`
+
+Learning: 使用 `select=eq(n,...)` 按帧号抽 contact sheet，在 concat 后可能因为时间戳/帧率细节漏掉片头或抽样错位。
+
+Evidence: 蔡依林 TOP5 首次 contact sheet 没有显示片头；改用 `-ss` 固定时间点逐帧抽图再 tile 后，正确覆盖 intro、Top5-Top1 和 closing。
+
+Action: 最终 QA contact sheet 优先按固定时间点抽帧，尤其是含 concat 或混音后重封装的成片。
+
+## 2026-05-16: Export Directory Should Only Keep Final Deliverables
+
+Experiment: `experiment-035`
+
+Learning: 用户希望后续视频任务只保留最终产物，不在 `sandbox/exports/<experiment-id>/` 里留下 base preview 或其他中间 MP4。
+
+Evidence: 蔡依林 TOP5 demo 产出 base preview 和最终 preview 两个 MP4 后，用户要求“下次记得只保留最终产物”。
+
+Action: 后续中间 MP4 放到 work directory，或最终混音/封装完成后删除；交付目录只保留最终 preview MP4 和 contact sheet。
+
+## 2026-05-16: Chinese Kokoro TTS Mangled Raw TOP5
+
+Experiment: `experiment-035`
+
+Learning: 当前默认 `zm_yunxi` 中文配音不应直接朗读 `TOP5` / `TOP10` 这类英文缩写加数字。Kokoro 的中文管线会把 `TOP5` 解析得不稳定，可能丢掉数字并生成奇怪尾音。
+
+Evidence: 蔡依林 TOP5 demo 首版片头读稿为 `蔡依林最难的歌，TOP5。`，用户听到“蔡依林最难的歌，”后接近奇怪 `zhong` 的尾音，没有读出完整 `TOP5`。音素检查显示 `TOP5` 被解析成类似 `TOPu`，数字未稳定进入读音。
+
+Action: 后续中文 TTS 读稿遇到 `TOP5/TOP10/Top 5/Top10` 时，送入 TTS 的文本统一改成 `前五名/前十名` 等中文可控读法；画面标题可以继续写 `TOP5/TOP10`。配音 QA 除了检查文件存在，还要检查 manifest 里是否有未规范化的英文缩写+数字。
+
 ## 2026-05-16: Sun Nan Difficulty Copy Should Emphasize Pressure And Thickness
 
 Experiment: `experiment-033`
@@ -587,3 +627,13 @@ Learning: 在本机 macOS / Apple Silicon 环境里，Kokoro pip + `misaki[zh]` 
 Evidence: Kokoro 生成 13 条中文 wav 和对应 demo mp4；用户试听后确认 videos 目录里的 `zm_yunxi` 符合想要的配音标准，并补充“即使不强调男也应该用这个声音”。MeloTTS/ChatTTS-ui 安装后推理或服务卡住，CosyVoice/GPT-SoVITS 被 conda/Python 版本阻断，IndexTTS2 被 git-lfs/uv 阻断。
 
 Action: 自动剪辑旁白默认使用 `config/tts/default-voiceover.json` 中的 `zm_yunxi`，通过 `scripts/tts/render-default-voiceover.sh` 生成；需要直接给视频加旁白时用 `scripts/tts/voiceover-video.sh`。要验证更高自然度或固定音色时，先补齐 conda、uv、git-lfs，并用 Python 3.10/3.11 建独立环境。
+
+## 2026-05-16: Hang-To-La With Default TTS Needs A Roomier Timeline
+
+Experiment: `experiment-034`
+
+Learning: 当前默认 `zm_yunxi` 配音比旧的“从夯到拉”测试声线自然但更慢。9 个条目加开头和结尾，如果保持逐对象揭晓，约 56 秒比 46 秒更适合口播和画面对齐。
+
+Evidence: 首次按 46 秒 SRT 生成时，后续 cue 被前句自然语速推迟，最终音频约 53.45 秒且多处 overrun；改成 56 秒时间线后最大 overrun 降到约 0.37 秒，contact sheet 中条目揭晓节奏正常。
+
+Action: 后续“从夯到拉”程序化榜单默认按 `4-5 秒开头 + 每条 4-5 秒 + 8 秒结尾` 估算时长；若要压到 45 秒以内，应减少条目或主动提高 TTS speed，而不是硬塞 9 个条目。

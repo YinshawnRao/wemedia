@@ -612,3 +612,61 @@ When this semaphore error appears, use approved local permissions for yt-dlp and
 - See Also: `ERR-20260515-001`
 
 ---
+
+## [ERR-20260516-009] python_one_liner_newline_escape
+
+**Logged**: 2026-05-16T17:35:00+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: tests
+
+### Summary
+A temporary Python one-liner used for HTML structure checks failed because escaped newlines were embedded incorrectly inside the shell command string.
+
+### Error
+```text
+SyntaxError: unexpected character after line continuation character
+```
+
+### Context
+- Task: structure-check `hyperframes/projects/sichuan-cuisine-hang-to-la-v2/index.html`.
+- The failure was in the ad hoc validation command, not in the HyperFrames source.
+- Resolution: replaced it with a simpler one-line regex-based structure check, which passed.
+
+### Suggested Fix
+For quick `python3 -c` validation commands, avoid embedding class definitions or literal `\n` blocks in a single quoted string. Use a simpler expression, a checked-in helper, or a temporary script only when necessary.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `hyperframes/projects/sichuan-cuisine-hang-to-la-v2/index.html`
+
+---
+
+## [ERR-20260516-010] contact_sheet_frame_number_miss
+
+**Logged**: 2026-05-16T17:48:00+08:00
+**Priority**: low
+**Status**: resolved
+**Area**: video
+
+### Summary
+Frame-number based contact sheet sampling missed the intro after a concatenated TOP5 preview was mixed and rewrapped.
+
+### Error
+```text
+Contact sheet first pass showed song segments but did not show the intro frame.
+```
+
+### Context
+- Task: QA `experiment-035` final preview.
+- Initial extraction used `select=eq(n,...)` against the final MP4.
+- Resolution: regenerated the contact sheet by extracting frames at fixed timestamps with `-ss`, then tiled those PNGs.
+
+### Suggested Fix
+For final QA after concat or re-muxing, prefer timestamp-based contact frames over frame-number selection.
+
+### Metadata
+- Reproducible: yes
+- Related Files: `experiments/experiment-035/run_log.md`
+
+---

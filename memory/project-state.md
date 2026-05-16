@@ -14,18 +14,18 @@ Last updated: 2026-05-16
 
 ## Active Experiment
 
-- Experiment: `experiment-033`
-- Direction: 孙楠最难的5首歌
-- Candidate topic: 用户提供孙楠 5 首高难度歌曲排名，按 Top5 -> Top1 揭晓；每段取最能体现演唱难点的片段，保留素材原声，叠加排名、歌名、歌手和演唱难点说明。
-- Status: 已完成 1 条本地预览 demo；5 个片段各约 34 秒，整体约 3 分钟。
+- Experiment: `experiment-035`
+- Direction: 蔡依林最难的歌 TOP5
+- Candidate topic: 用户提供蔡依林 5 首高难度歌曲排名，成片按 Top5 -> Top1 揭晓；每段约 34 秒，取能体现唱跳、咬字、气息、节奏切分或情绪控制压力的片段。片头使用默认 `zm_yunxi` 只读主标题。
+- Status: 已完成 1 条本地预览 demo；整体约 3 分钟，5 段素材均下载到 sandbox，最终视频已混入片头配音。
 
 ## Next Step
 
-查看孙楠最难的歌 TOP5 demo，判断每首歌切点是否真正命中“最难段落”，尤其 Top1《拯救》的后段持续声压、Top2《燃烧》的真假声与高点段，以及《风往北吹》使用歌词视频源、《燃烧》《拯救》使用 Topic 音频源的画面静态程度是否可接受：
+查看“蔡依林最难的歌 TOP5” demo，重点判断每首歌切点是否真正命中“最难段落”，尤其 Top1《舞娘》的唱跳气息、Top2《Play 我呸》的密集咬字、Top3《怪美的》的切分与态度，以及 Top4《倒带》使用官方音频静态画面的取舍是否可接受：
 
 ```text
-sandbox/exports/experiment-033/sun-nan-top5-vocal-difficulty-preview.mp4
-sandbox/exports/experiment-033/sun-nan-top5-vocal-difficulty-contact-sheet.jpg
+sandbox/exports/experiment-035/jolin-top5-vocal-difficulty-preview.mp4
+sandbox/exports/experiment-035/jolin-top5-vocal-difficulty-contact-sheet.jpg
 ```
 
 ## Important Runtime Notes
@@ -85,3 +85,9 @@ sandbox/exports/experiment-033/sun-nan-top5-vocal-difficulty-contact-sheet.jpg
 - 当官方 MV 不好找时，官方 artist/Topic 音频源适合作为声音优先的本地预览方案；如果用户看重画面运动，二版再替换 MV 或现场备选。
 - `experiment-033` 孙楠难度盘点适合强调“高压厚声型”：高位亮硬、持续声压、呼喊穿透、真假声转换、厚度和后段续航；不要只写最高音。
 - 对男声高压难度盘点，Topic audio 适合先验证声音和切点，但如果用户重视画面运动，二版优先替换为官方 MV 或官方节目 live。
+- `experiment-034` 验证了当前默认 `zm_yunxi` 配音用于“从夯到拉”短视频时，9 个条目更适合约 56 秒节奏；如果硬压到 46 秒，逐句口播会明显拥挤。
+- `experiment-035` 蔡依林难度盘点适合强调“唱跳综合难度”：气息切分、密集咬字、律动、肢体控制、态度稳定和边动边准，不要只按传统高音逻辑写。
+- 当 TOP5 预览需要片头配音但歌曲段保留原声时，只把短 voiceover 混到开头，避免用全片 ducking 脚本压低后续歌曲音量。
+- ffmpeg 按帧号抽 contact sheet 在 concat 后可能漏掉片头；对最终成片 QA 优先按固定时间点逐帧抽图再 tile。
+- 用户明确偏好后续只保留最终产物：`sandbox/exports/<experiment-id>/` 里不要留下 base preview、临时混音版等中间 MP4；最终交付只保留 final preview 和 contact sheet。
+- `experiment-035` 暴露出 Kokoro 中文 TTS 对原样 `TOP5` 解析不稳定，会把数字读丢或产生奇怪尾音；后续片头配音遇到 `TOP5/TOP10` 统一改用 `前五名/前十名` 等中文读法，视觉标题仍可保留 `TOP5/TOP10`。

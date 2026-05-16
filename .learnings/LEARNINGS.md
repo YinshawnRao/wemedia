@@ -275,3 +275,26 @@ After downloading music/live sources, generate or inspect a contact sheet before
 - Tags: music, source-selection, qa, live-video
 
 ---
+
+## [LRN-20260516-004] correction
+
+**Logged**: 2026-05-16T17:58:00+08:00
+**Priority**: high
+**Status**: pending
+**Area**: video
+
+### Summary
+Do not pass raw `TOP5` or similar English/digit markers directly into Chinese Kokoro TTS.
+
+### Details
+The user corrected the Experiment 035 intro voiceover: the title should communicate `蔡依林最难的歌 TOP5`, but the generated audio sounded like it stopped after `蔡依林最难的歌` and then produced a strange tail syllable. Inspection showed Kokoro's Chinese pipeline parsed `TOP5` unstably, effectively dropping the digit.
+
+### Suggested Action
+For Chinese title narration, normalize visual markers before TTS: `TOP5` -> `前五名`, `TOP10` -> `前十名`, while keeping the on-screen title as `TOP5/TOP10`. Add a manifest check for raw all-caps/digit combinations before final delivery.
+
+### Metadata
+- Source: user_feedback
+- Related Files: `experiments/experiment-035/run_log.md`, `memory/video-production-contract.md`
+- Tags: tts, pronunciation, music, qa
+
+---

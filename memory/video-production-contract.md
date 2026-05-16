@@ -85,6 +85,7 @@ Default format:
 - concise lower-third text
 - contact sheet for visual QA
 - preview video in `sandbox/exports/<experiment-id>/`
+- keep only final deliverables in `sandbox/exports/<experiment-id>/`; intermediate base renders should stay in a work directory or be removed after the final MP4 is created
 
 When narration is requested, use the project default voice. This applies even when the user does not say “male voice”; any 配音 / 旁白 / 解说 / 口播 request maps to this voice:
 
@@ -97,6 +98,8 @@ source standard: tts-local-benchmark Kokoro male output approved by user
 ```
 
 Do not ask for a voice choice during normal video goals. Do not use the deprecated ONNX Kokoro runtime, `.venv-kokoro-runtime`, `models/kokoro/`, `am_michael`, `zf_xiaobei`, or old voice-map files.
+
+For Chinese `zm_yunxi` voiceover, do not pass raw mixed English/digit title markers such as `TOP5`, `TOP10`, `Top 5`, or `Top10` directly to TTS. Normalize spoken text to stable Chinese wording such as `前五名` / `前十名` while keeping the visual title as `TOP5` / `TOP10`. Before final delivery, inspect the TTS manifest and, when the title contains abbreviations or digits, treat the voiceover as needing an explicit pronunciation check.
 
 For `TOP5` difficulty/甜歌/翻唱/作品盘点 videos:
 
@@ -212,6 +215,7 @@ Before final response:
 
 - preview MP4 exists
 - contact sheet exists
+- no extra intermediate MP4 remains beside the final preview unless the user explicitly asks to keep it
 - `ffprobe` confirms 1080x1920, H.264, AAC stereo
 - audio is present and not silent
 - contact sheet visually shows intro, all segments, and closing
