@@ -67,8 +67,11 @@
 ## 素材选择与下载约束
 
 - 音乐盘点的来源优先级：官方 MV > 官方 live > 官方 audio / artist Topic > 可信授权源 > `rights_review` 备选源。
+- 凡任务、brief、source log 或成片段落标记为“MV / 官方 MV / 音乐 MV 片段”，最终剪辑必须使用真实动态 MV、现场或剧情画面，不得用纯静态专辑封面、Topic audio、官方 audio、poster 图或单张歌词封面冒充 MV。
+- 官方 audio / artist Topic 只能作为声音定位或明确标注的声音优先测试源；如果画面是静态图，必须在 `source_candidates.md` 和最终说明中降级写成 audio/lyric/poster caveat，不能称为 MV 片段。
 - 官方 audio / artist Topic 可以作为首版本地预览的声音优先方案；如果画面太静，后续再替换为 MV 或现场源，并在 `source_candidates.md` 说明。
 - 不用非官方源替换官方源，除非官方源没有画面、没有目标片段、质量太差或下载失败；替换原因必须记录。
+- 下载后必须对每个音乐 MV 候选抽早/中/后三帧或生成 source review/contact sheet，检查是否确实有动态 MV 画面；发现纯静态专辑封面、海报、单张歌词图或长时间无画面变化，优先换同官方/可信动态源或调整切点，并记录替换原因。
 - YouTube 搜索和下载默认顺序执行，不并行跑多个 `yt-dlp`，避免本机/沙盒 semaphore 问题。
 - `yt-dlp` 默认参数包含 `--cookies-from-browser chrome --js-runtimes node --merge-output-format mp4`。
 - 测试切片默认限制最高 1080p：`YTDLP_FORMAT='bv*[height<=1080]+ba/b[height<=1080]/b'`。
@@ -104,6 +107,7 @@
 - 每个本地 demo 至少导出一个预览 MP4 和一张 contact sheet。
 - 默认规格：竖屏 `1080x1920`、H.264、AAC stereo、30fps 左右。
 - 交付前必须检查：倒序/章节结构、可见文案黑名单、接触表视觉可读性、音频存在、导出尺寸和时长。
+- 含音乐 MV 片段的 demo 必须额外检查“真 MV 画面”：source review/contact sheet 里每个 MV 段都应有真实动态画面；纯静态专辑封面、poster 图、Topic audio 封面或单张歌词图冒充 MV 是 QA 失败，必须换源、换切点或把该段从 MV 片段降级为明确的 audio/lyric/poster caveat。
 - 含配音或音乐盘点的 demo 必须额外检查音频连续性、死画面和旁白后停顿：`silencedetect` 不得出现超过 1 秒的整片静音；片头/章节/转场旁白最后一个可听字后，应有 0.8-1.2 秒消化位再进入歌曲或下一段；章节交界处不得出现“配音已停、音乐未起、画面静止”的空等，也不得出现最后一个字刚结束就瞬间硬切；如果发现必须返工后再交付。
 - 如果使用 `scripts/video/pillow_top5_renderer.py` 快速预览，要先做 Python 语法检查；`PYTHONPYCACHEPREFIX` 指向 `sandbox/pycache`。
 - 最终回复用户时要给出本地视频和 contact sheet 的绝对路径图片/视频链接，并简要说明 QA 结果和记录文件位置。
