@@ -9,7 +9,7 @@
 1. 先确认当前目录是 `/Users/yinshawnrao/explorer/wemedia`。
 2. 先读本文件 `AGENTS.md`、`memory/video-production-contract.md`、`memory/project-state.md`、`memory/learnings.md` 和 `DESIGN.md`，再开始搜素材、下载或剪辑。
 3. 如果用户是在延续某个实验，继续读对应 `experiments/<experiment-id>/run_log.md`、`demo_output.md`、`source_candidates.md` 和 `data/briefs/<slug>.md`。
-4. 新开实验时用下一个连续编号 `experiments/experiment-XXX/`，不得另起随意目录名。
+4. 新开实验时，实验记录目录仍用下一个连续编号 `experiments/experiment-XXX/`，不得另起随意目录名；但导出目录不得再用裸编号，必须使用内容相关的 `sandbox/exports/<video-slug>--<run-token>/`。
 5. 如果本文件和历史对话印象冲突，以本文件和 `memory/video-production-contract.md` 为准。
 
 ## 当前默认模式
@@ -18,7 +18,9 @@
 - 用户没有明确说“正式入库”“正式发布”“生成可商用交付包”时，一律使用 `WEMEDIA_OUTPUT_MODE=test` 的思路。
 - 默认所有下载、切片、渲染、接触表、试剪视频都写入 `sandbox/`；不得把测试产物写进 `downloads/`、`clips/`、`audio/`、`subtitles/`、`assets/exports/` 等正式目录。
 - 音乐盘点类 demo 默认优先保留素材原声；只要用户明确要求配音、旁白、解说或口播，自动使用当前项目默认配音声线，不再询问 TTS 方案或声音选择。
-- 默认交付的是本地 demo：`sandbox/exports/<experiment-id>/<slug>-preview.mp4` 和 `<slug>-contact-sheet.jpg`。
+- 默认交付的是本地 demo：`sandbox/exports/<video-slug>--<run-token>/<slug>-preview.mp4` 和 `<slug>-contact-sheet.jpg`。
+- `sandbox/exports/` 目录禁止新建裸 `experiment-XXX/`；导出目录名必须以内容 slug 开头，例如 `maplestory-bgm-top5--20260524-1430/`。如果接手旧任务，优先读取记录里的 `Export dir`，不要从实验编号反推导出目录。
+- `sandbox/exports/` 根目录只放导出子目录和 `.gitkeep` 等 housekeeping 文件；测试音频、TTS 探针、临时渲染和 scratch 文件放到 `sandbox/work/`、`sandbox/voiceover/` 或任务自己的导出子目录。
 - 所有未明确授权的音乐/视频素材仍标记 `rights_review`；这表示“本地测试仍需留痕”，不是“阻止制作”。不能声称可商用。
 
 ## 工作顺序
@@ -47,8 +49,10 @@
 - 如果视频原本有素材原声且用户要求配音，默认降低素材原声音量并让旁白保持清晰；音乐盘点是否保留完整副歌优先级高于旁白密度。
 - 配音与音乐/画面衔接是硬约束：旁白结束后不能产生死静或静止空等；全片不得出现超过 1 秒的可感知整片静音空档。
 - 片头标题、章节/转场介绍文字的配音结束后，必须保留约 1 秒（0.8-1.2 秒）的听感消化位，再切入歌曲或下一段盘点；不得在最后一个字刚落下的瞬间硬切。这个停顿应保留当前画面或轻微运动，并用低音量音乐床、素材预入、环境声或转场音支撑，避免变成死静。
+- 配音裁剪不得切掉尾字、数字后的量词或标题最后一个词。中文短标题、片头/片尾口播、`五首歌`、`前五名`、`沧海遗珠` 这类句子禁止使用强反转 `silenceremove` 裁尾；默认只裁开头空白，尾部保留完整可听尾音，再加 0.8-1.2 秒有声消化位。只有人工听感确认尾字完整后，才允许做极轻微裁尾。
+- 交付含配音视频前，必须核对 TTS 原始音频、处理后音频和片头/片尾段时长；如果处理后音频比原始音频短得异常（例如短句被裁掉 0.5 秒以上，或结尾字听感缺失），必须回退到“只裁开头、不裁尾”的安全版本并重新渲染。
 - 不允许“静止画面 + 无声等待”作为转场。片头、章节卡、结尾卡如果超过 1.5 秒，必须有旁白、素材原声、背景音乐或明确的视觉运动；否则缩短、叠到 MV/现场画面上，或改成有声过渡。
-- 使用 Pillow/ffmpeg 快速预览时，禁止生成长时间 `anullsrc` 静态段后再依赖后期配音覆盖；每个 still/slate 段的时长必须跟配音或背景声实际长度对齐。片头/转场卡按“裁尾后的可听旁白时长 + 默认约 1 秒消化位”计算，其它旁白边界可贴边或轻微交叠到下一段素材声。
+- 使用 Pillow/ffmpeg 快速预览时，禁止生成长时间 `anullsrc` 静态段后再依赖后期配音覆盖；每个 still/slate 段的时长必须跟配音或背景声实际长度对齐。片头/转场卡按“完整可听旁白时长 + 默认约 1 秒消化位”计算，其它旁白边界可贴边或轻微交叠到下一段素材声。
 - 未来如需换声音，必须由用户明确提出“更换默认配音声线”后再重新调整；在此之前，所有配音需求都使用 `zm_yunxi`。
 
 ## 音乐盘点视频硬规则
@@ -74,6 +78,8 @@
 - 下载后必须对每个音乐 MV 候选抽早/中/后三帧或生成 source review/contact sheet，检查是否确实有动态 MV 画面；发现纯静态专辑封面、海报、单张歌词图或长时间无画面变化，优先换同官方/可信动态源或调整切点，并记录替换原因。
 - YouTube 搜索和下载默认顺序执行，不并行跑多个 `yt-dlp`，避免本机/沙盒 semaphore 问题。
 - `yt-dlp` 默认参数包含 `--cookies-from-browser chrome --js-runtimes node --merge-output-format mp4`。
+- 当前项目做 YouTube 素材搜索、metadata inspect、格式检查或下载时，默认必须走 Chrome cookies 路线：`--cookies-from-browser chrome --js-runtimes node`。不要因为无 cookies 请求遇到 bot/cookie 校验，就擅自改成无 cookies 流程、B 站搬运、非官方源或其它绕路方案。
+- 如果运行环境要求确认浏览器 cookies 访问，必须直接向用户说明“需要读取 Chrome cookies 才能按项目默认流程下载 YouTube 素材”，并请求明确授权；用户授权后继续使用同一 URL、同一切点和上述参数。只有用户明确拒绝 cookies、Chrome cookies 连续失败且已记录，或官方源确实不可用时，才降级到其它平台/非官方备选，并在 `source_candidates.md` 和 `run_log.md` 写明原因。
 - 测试切片默认限制最高 1080p：`YTDLP_FORMAT='bv*[height<=1080]+ba/b[height<=1080]/b'`。
 - 音乐盘点首版通常不需要下载字幕；可用 `--no-write-subs --no-write-auto-subs` 减少字幕 HTTP 429 风险。
 - 如果 YouTube 返回 bot/cookie 问题，先确认 Chrome 登录和 cookies 权限；不要重新安装 `yt-dlp`。
@@ -84,6 +90,7 @@
 - 跨对话需要继承的状态写入 `memory/`。
 - 每轮实验的计划、选题、素材候选、brief、复盘写入 `experiments/<experiment-id>/`。
 - 临时下载、测试导出、试剪产物写入 `sandbox/`，这些内容可以删除和重跑。
+- 每轮实验必须在 `README.md`、`run_log.md` 或 `demo_output.md` 记录本轮 `Export dir`；`sandbox/exports/` 使用内容相关目录名，格式为 `<video-slug>--<run-token>`，不得用裸 `experiment-XXX`。
 - 每次完成有价值的流程调整、失败原因或选题判断后，更新 `memory/learnings.md` 或当前实验的 `run_log.md`。
 - 每次完成视频 demo 后必须更新：当前实验 `README.md`、`source_candidates.md`、`run_log.md`、`demo_output.md`，对应 `data/sources/`、`data/briefs/`，以及 `memory/project-state.md` 和必要的 `memory/learnings.md`。
 - 如果发生可复用错误或修复方式，也要更新 `.learnings/ERRORS.md`。
