@@ -9,7 +9,7 @@
 1. 先确认当前目录是 `/Users/yinshawnrao/explorer/wemedia`。
 2. 先读本文件 `AGENTS.md`、`memory/video-production-contract.md`、`memory/project-state.md`、`memory/learnings.md` 和 `DESIGN.md`，再开始搜素材、下载或剪辑。
 3. 如果用户是在延续某个实验，继续读对应 `experiments/<experiment-id>/run_log.md`、`demo_output.md`、`source_candidates.md` 和 `data/briefs/<slug>.md`。
-4. 新开实验时，实验记录目录仍用下一个连续编号 `experiments/experiment-XXX/`，不得另起随意目录名；但导出目录不得再用裸编号，必须使用内容相关的 `sandbox/exports/<video-slug>--<run-token>/`。
+4. 新开实验时，先用 `scripts/experiments/claim-next.sh --slug <video-slug> --topic "<topic>"` 原子领取下一个连续编号；实验记录目录仍用 `experiments/experiment-XXX/`，不得另起随意目录名。导出目录不得再用裸编号，必须使用内容相关的 `sandbox/exports/<video-slug>--<run-token>/`。
 5. 如果本文件和历史对话印象冲突，以本文件和 `memory/video-production-contract.md` 为准。
 
 ## 当前默认模式
@@ -47,6 +47,7 @@
 - 输出位置：默认写入 `sandbox/voiceover/<experiment-id>/` 或当前任务的 sandbox 目录，不写入正式 `audio/`，除非用户明确要求正式入库。
 - 不再使用已废弃的旧 Kokoro ONNX runtime、`.venv-kokoro-runtime`、`models/kokoro/`、`am_michael`、`zf_xiaobei` 或旧 voice-map 文件。
 - 如果视频原本有素材原声且用户要求配音，默认降低素材原声音量并让旁白保持清晰；音乐盘点是否保留完整副歌优先级高于旁白密度。
+- 含歌曲原声 + 段首配音的音乐盘点，不得只依赖轻量 sidechain 或默认 `amix` 让配音“技术上混进去了”。旁白窗口内必须确定性 duck：按配音 WAV 实际时长计算窗口，把歌曲压到明确背景层，让配音处在前景；旁白结束后再让歌曲自然抬高。经验值：歌曲窗口音量可先降到约 `0.12-0.20`，配音前景增益再进 limiter；具体数值以听感和不削波为准。
 - 配音与音乐/画面衔接是硬约束：旁白结束后不能产生死静或静止空等；全片不得出现超过 1 秒的可感知整片静音空档。
 - 片头标题、章节/转场介绍文字的配音结束后，必须保留约 1 秒（0.8-1.2 秒）的听感消化位，再切入歌曲或下一段盘点；不得在最后一个字刚落下的瞬间硬切。这个停顿应保留当前画面或轻微运动，并用低音量音乐床、素材预入、环境声或转场音支撑，避免变成死静。
 - 配音裁剪不得切掉尾字、数字后的量词或标题最后一个词。中文短标题、片头/片尾口播、`五首歌`、`前五名`、`沧海遗珠` 这类句子禁止使用强反转 `silenceremove` 裁尾；默认只裁开头空白，尾部保留完整可听尾音，再加 0.8-1.2 秒有声消化位。只有人工听感确认尾字完整后，才允许做极轻微裁尾。
@@ -79,7 +80,7 @@
 - YouTube 搜索和下载默认顺序执行，不并行跑多个 `yt-dlp`，避免本机/沙盒 semaphore 问题。
 - `yt-dlp` 默认参数包含 `--cookies-from-browser chrome --js-runtimes node --merge-output-format mp4`。
 - 当前项目做 YouTube 素材搜索、metadata inspect、格式检查或下载时，默认必须走 Chrome cookies 路线：`--cookies-from-browser chrome --js-runtimes node`。不要因为无 cookies 请求遇到 bot/cookie 校验，就擅自改成无 cookies 流程、B 站搬运、非官方源或其它绕路方案。
-- 如果运行环境要求确认浏览器 cookies 访问，必须直接向用户说明“需要读取 Chrome cookies 才能按项目默认流程下载 YouTube 素材”，并请求明确授权；用户授权后继续使用同一 URL、同一切点和上述参数。只有用户明确拒绝 cookies、Chrome cookies 连续失败且已记录，或官方源确实不可用时，才降级到其它平台/非官方备选，并在 `source_candidates.md` 和 `run_log.md` 写明原因。
+- 用户已在 2026-05-26 为本项目给出长期授权：在 `/Users/yinshawnrao/explorer/wemedia` 内执行 YouTube 素材搜索、metadata inspect、格式检查或下载时，默认允许使用 `--cookies-from-browser chrome --js-runtimes node` 读取本机 Chrome cookies；不要在聊天里反复询问“是否允许 Chrome cookies”。如果 Codex/系统级沙盒仍弹出权限确认，这是平台权限边界，不是 `AGENTS.md` 能绕过；应直接按工具要求发起一次可持久化的权限请求，优先把权限限定到 `yt-dlp` 或本项目下载脚本。只有用户明确撤回 cookies 授权、Chrome cookies 连续失败且已记录，或官方源确实不可用时，才降级到其它平台/非官方备选，并在 `source_candidates.md` 和 `run_log.md` 写明原因。
 - 测试切片默认限制最高 1080p：`YTDLP_FORMAT='bv*[height<=1080]+ba/b[height<=1080]/b'`。
 - 音乐盘点首版通常不需要下载字幕；可用 `--no-write-subs --no-write-auto-subs` 减少字幕 HTTP 429 风险。
 - 如果 YouTube 返回 bot/cookie 问题，先确认 Chrome 登录和 cookies 权限；不要重新安装 `yt-dlp`。
@@ -89,6 +90,7 @@
 
 - 跨对话需要继承的状态写入 `memory/`。
 - 每轮实验的计划、选题、素材候选、brief、复盘写入 `experiments/<experiment-id>/`。
+- 新开实验不得只靠人工扫描最大编号。必须先运行 `scripts/experiments/claim-next.sh --slug <video-slug> --topic "<topic>"` 领取编号；如果脚本发现并行任务抢先创建了同一编号，会自动尝试下一个编号。
 - 临时下载、测试导出、试剪产物写入 `sandbox/`，这些内容可以删除和重跑。
 - 每轮实验必须在 `README.md`、`run_log.md` 或 `demo_output.md` 记录本轮 `Export dir`；`sandbox/exports/` 使用内容相关目录名，格式为 `<video-slug>--<run-token>`，不得用裸 `experiment-XXX`。
 - 每次完成有价值的流程调整、失败原因或选题判断后，更新 `memory/learnings.md` 或当前实验的 `run_log.md`。
@@ -115,7 +117,7 @@
 - 默认规格：竖屏 `1080x1920`、H.264、AAC stereo、30fps 左右。
 - 交付前必须检查：倒序/章节结构、可见文案黑名单、接触表视觉可读性、音频存在、导出尺寸和时长。
 - 含音乐 MV 片段的 demo 必须额外检查“真 MV 画面”：source review/contact sheet 里每个 MV 段都应有真实动态画面；纯静态专辑封面、poster 图、Topic audio 封面或单张歌词图冒充 MV 是 QA 失败，必须换源、换切点或把该段从 MV 片段降级为明确的 audio/lyric/poster caveat。
-- 含配音或音乐盘点的 demo 必须额外检查音频连续性、死画面和旁白后停顿：`silencedetect` 不得出现超过 1 秒的整片静音；片头/章节/转场旁白最后一个可听字后，应有 0.8-1.2 秒消化位再进入歌曲或下一段；章节交界处不得出现“配音已停、音乐未起、画面静止”的空等，也不得出现最后一个字刚结束就瞬间硬切；如果发现必须返工后再交付。
+- 含配音或音乐盘点的 demo 必须额外检查音频连续性、死画面、旁白前景感和旁白后停顿：`silencedetect` 不得出现超过 1 秒的整片静音；片头/章节/转场旁白窗口要单独抽查，确认人声在手机外放语境下能清楚听见，不能只看“音频流存在”或全片平均响度；片头/章节/转场旁白最后一个可听字后，应有 0.8-1.2 秒消化位再进入歌曲或下一段；章节交界处不得出现“配音已停、音乐未起、画面静止”的空等，也不得出现最后一个字刚结束就瞬间硬切；如果发现必须返工后再交付。
 - 如果使用 `scripts/video/pillow_top5_renderer.py` 快速预览，要先做 Python 语法检查；`PYTHONPYCACHEPREFIX` 指向 `sandbox/pycache`。
 - 最终回复用户时要给出本地视频和 contact sheet 的绝对路径图片/视频链接，并简要说明 QA 结果和记录文件位置。
 
